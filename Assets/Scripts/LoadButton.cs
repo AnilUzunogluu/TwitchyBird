@@ -2,8 +2,9 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class StartButton : MonoBehaviour
+public class LoadButton : MonoBehaviour
 {
+    [SerializeField] private string SceneNameToLoad;
     private Animator _animator;
 
     private void Start()
@@ -14,12 +15,12 @@ public class StartButton : MonoBehaviour
     public void StartGame()
     {
         _animator.SetTrigger("Pressed");
-        StartCoroutine(LoadGame());
+        StartCoroutine(LoadScene(SceneNameToLoad));
     }
-    private IEnumerator LoadGame()
+    private IEnumerator LoadScene(string sceneName)
     {
         yield return new WaitForSeconds(0.5f);
-        SceneManager.LoadScene("Game");
+        SceneManager.LoadScene(sceneName);
     }
     
     

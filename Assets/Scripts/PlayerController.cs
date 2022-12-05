@@ -12,14 +12,12 @@ public class PlayerController : MonoBehaviour
     
     [SerializeField] private UnityEvent onTap;
     [SerializeField] private UnityEvent onPoint;
-
-
-    [SerializeField] private float velocity;
-
+    [SerializeField] private UnityEvent onDeath;
 
     private Rigidbody2D _rigidbody;
     private float _lastClickTime;
     private GameObject _birdSprite;
+    private bool _isAlive = true;
 
 
     private void Start()
@@ -30,6 +28,12 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        if (!_isAlive)
+        {
+            _birdSprite.GetComponent<Animator>().SetTrigger("Dead");
+            return;
+        }
+        
         if (Input.GetMouseButtonDown(0))
         {
             onTap?.Invoke();
@@ -45,8 +49,6 @@ public class PlayerController : MonoBehaviour
         }
         
         SetRotation();
-
-        velocity = _rigidbody.velocity.y;
     }
 
     private float TimeBetweenTaps(float lastClick)
@@ -57,7 +59,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D col)
     {
-        if (col.gameObject.CompareTag("Pipe"))
+        if (col.gameObject.CompareTag("ScoreTrigger"))
         {
             onPoint?.Invoke();
         }
@@ -65,9 +67,9 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D col)
     {
-        if (col.gameObject.CompareTag("Pipe"))
+        if ((col.gameObject.CompareTag("Pipe") || col.gameObject.CompareTag("Base")) && _isAlive)
         {
-            Debug.Log("Dead!");
+            Die();
         }
     }
 
@@ -104,4 +106,13 @@ public class PlayerController : MonoBehaviour
         var targetRotation = Quaternion.Euler(new Vector3(0f, 0f, upwardsRotationAngle));
         _birdSprite.transform.rotation = Quaternion.RotateTowards(_birdSprite.transform.rotation, targetRotation, rotationSpeed * 5 * Time.deltaTime);
     }
+
+    private void Die()
+    {
+        _isAlive = false;
+        onDeath?.Invoke();
+        FallRotation(-400f);
+        GameManager.Instance.SetGameOver();
+    }
+    
 }
