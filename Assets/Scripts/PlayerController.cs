@@ -44,7 +44,7 @@ public class PlayerController : MonoBehaviour
             }
             
             _lastClickTime = Time.time;
-            
+            _rigidbody.velocity *= 0.8f;
             _rigidbody.AddForce(Vector3.up * upwardsForce, ForceMode2D.Force);
         }
         

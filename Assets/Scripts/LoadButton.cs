@@ -4,7 +4,8 @@ using UnityEngine.SceneManagement;
 
 public class LoadButton : MonoBehaviour
 {
-    [SerializeField] private string SceneNameToLoad;
+    [SerializeField] private string sceneNameToLoad;
+    [SerializeField] private float loadDelay;
     private Animator _animator;
 
     private void Start()
@@ -15,11 +16,11 @@ public class LoadButton : MonoBehaviour
     public void StartGame()
     {
         _animator.SetTrigger("Pressed");
-        StartCoroutine(LoadScene(SceneNameToLoad));
+        StartCoroutine(LoadScene(sceneNameToLoad));
     }
     private IEnumerator LoadScene(string sceneName)
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(loadDelay);
         SceneManager.LoadScene(sceneName);
     }
     
