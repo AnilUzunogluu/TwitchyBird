@@ -3,9 +3,14 @@ using UnityEngine;
 public abstract class Reposition : MonoBehaviour
 {
     [SerializeField] protected Vector3 resetPosition;
-    
-    protected string _targetTag;
-    
+
+    private string _targetTag;
+
+    private void OnEnable()
+    {
+        _targetTag = GetTargetTag();
+    }
+
     private void OnTriggerEnter2D(Collider2D col)
     {
         if (col.CompareTag(_targetTag))
@@ -18,4 +23,6 @@ public abstract class Reposition : MonoBehaviour
     {
         transform.position = resetPosition;
     }
+
+    protected abstract string GetTargetTag();
 }

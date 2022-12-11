@@ -4,8 +4,8 @@ public class RepositionBase : Reposition
 {
     [SerializeField] private GameObject targetCollider;
 
-    private void Start()
+    protected override string GetTargetTag()
     {
-        _targetTag = targetCollider.tag;
+        return targetCollider.tag;
     }
 }

@@ -1723,11 +1723,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameOverScreen: {fileID: 915193407}
+  scoreManager: {fileID: 937678944}
   scoreText: {fileID: 301384603}
   highScoreText: {fileID: 1530488801}
   newHighScoreLabel: {fileID: 247181246}
-  medalObject: {fileID: 1996082669}
-  medalAnimationObject: {fileID: 117254929}
+  medalObjectSpriteRenderer: {fileID: 1996082671}
+  medalAnimator: {fileID: 117254931}
   bronzeMedal: {fileID: 21300000, guid: b27d862862e6d8445a95309b3c92d02f, type: 3}
   silverMedal: {fileID: 21300000, guid: c8f0f7e1c0c8f0a4e923b4426db2b195, type: 3}
   goldMedal: {fileID: 21300000, guid: 6bb84f28af0f1704cbbdc6202504c686, type: 3}
@@ -2641,6 +2642,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 207791529, guid: d7352eb07610ab246ad8ca080b3fc915, type: 3}
+      propertyPath: rapidTapVelocityReducer
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 207791529, guid: d7352eb07610ab246ad8ca080b3fc915, type: 3}
+      propertyPath: increasingRotationSpeedMultiplier
+      value: 0.3
+      objectReference: {fileID: 0}
     - target: {fileID: 207791529, guid: d7352eb07610ab246ad8ca080b3fc915, type: 3}
       propertyPath: onTap.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 

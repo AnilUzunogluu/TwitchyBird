@@ -1,16 +1,22 @@
 using UnityEngine;
 using UnityEngine.Events;
+using Quaternion = UnityEngine.Quaternion;
+using Vector3 = UnityEngine.Vector3;
 
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float upwardsForce;
-    
+    [SerializeField] private float rapidTapVelocityReducer = 0.8f;
+    [SerializeField] private float rapidTapTimeThreshold = 0.2f;
+
     [Header("Rotation Variables")]
     [SerializeField] private float upwardsRotationAngle;
     [SerializeField] private float rotationSpeed;
-    
-    
-    [SerializeField] private UnityEvent onTap;
+    [SerializeField] private float fallRotationAngleMultiplier = 20f;
+    [SerializeField] private float increasingRotationSpeedMultiplier = 0.3f;
+
+
+    [SerializeField, Space] private UnityEvent onTap;
     [SerializeField] private UnityEvent onPoint;
     [SerializeField] private UnityEvent onDeath;
 
@@ -38,13 +44,16 @@ public class PlayerController : MonoBehaviour
         {
             onTap?.Invoke();
 
-            if (TimeBetweenTaps(_lastClickTime) > 0.2f)
+            if (TimeBetweenTaps(_lastClickTime) > rapidTapTimeThreshold)
             {            
                 _rigidbody.velocity = Vector3.zero;
             }
+            else
+            {
+                _rigidbody.velocity *= rapidTapVelocityReducer;
+            }
             
             _lastClickTime = Time.time;
-            _rigidbody.velocity *= 0.8f;
             _rigidbody.AddForce(Vector3.up * upwardsForce, ForceMode2D.Force);
         }
         
@@ -89,29 +98,35 @@ public class PlayerController : MonoBehaviour
 
     private void FallRotation(float yVelocity)
     {
-        var rotationAngle = yVelocity * 20;
+        var rotationAngle = yVelocity * fallRotationAngleMultiplier;
         
         if (rotationAngle < -90)
         {
             rotationAngle = -90;
         }
         
-        var targetRotation = Quaternion.Euler(new Vector3(0f, 0f, rotationAngle));
-        var increasingRotationSpeed = Mathf.Abs((float) (yVelocity * 0.3 * rotationSpeed));
-        _birdSprite.transform.rotation = Quaternion.RotateTowards(_birdSprite.transform.rotation, targetRotation, increasingRotationSpeed * Time.deltaTime);
+        var targetRotation = Quaternion.Euler(Vector3.forward * rotationAngle);
+        var increasingRotationSpeed = Mathf.Abs(yVelocity * increasingRotationSpeedMultiplier * rotationSpeed);
+        SetBirdSpriteRotation(targetRotation, increasingRotationSpeed);
     }
 
     private void UpRotation()
     {
-        var targetRotation = Quaternion.Euler(new Vector3(0f, 0f, upwardsRotationAngle));
-        _birdSprite.transform.rotation = Quaternion.RotateTowards(_birdSprite.transform.rotation, targetRotation, rotationSpeed * 5 * Time.deltaTime);
+        var targetRotation = Quaternion.Euler(Vector3.forward * upwardsRotationAngle);
+        
+        SetBirdSpriteRotation(targetRotation, rotationSpeed * 5);
+    }
+
+    private void SetBirdSpriteRotation(Quaternion targetRotation, float rotationSpeed)
+    {
+        _birdSprite.transform.rotation = Quaternion.RotateTowards(_birdSprite.transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
     }
 
     private void Die()
     {
         _isAlive = false;
         onDeath?.Invoke();
-        FallRotation(-400f);
+        FallRotation(float.MinValue);
         GameManager.Instance.SetGameOver();
     }
     

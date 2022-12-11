@@ -1,84 +1,81 @@
+using System;
 using TMPro;
 using UnityEngine;
 
 public class UIManager : MonoBehaviour
 {
     [SerializeField] private GameObject gameOverScreen;
-    
+    [SerializeField] private ScoreManager scoreManager;
+
     [Header("Score")]
     [SerializeField] private TextMeshProUGUI scoreText;
     [SerializeField] private TextMeshProUGUI highScoreText;
     [SerializeField] private GameObject newHighScoreLabel;
 
     [Header("Medal")]
-    [SerializeField] private GameObject medalObject;
-    [SerializeField] private GameObject medalAnimationObject;
+    [SerializeField] private SpriteRenderer medalObjectSpriteRenderer;
+    [SerializeField] private Animator medalAnimator;
     [SerializeField] private Sprite bronzeMedal;
     [SerializeField] private Sprite silverMedal;
     [SerializeField] private Sprite goldMedal;
-
     
-    private ScoreManager _scoreManager;
-
-    private void Awake()
-    {
-        _scoreManager = FindObjectOfType<ScoreManager>();
-    }
 
     private void OnEnable()
     {
         GameManager.Instance.OnGameOver += SetGameOverScreen;
-        _scoreManager.brokenHighScore += ActivateNewHighScoreLabel;
+        scoreManager.OnHighScoreChanged += ActivateNewHighScoreChangedLabel;
     }
 
     private void OnDisable()
     {
         GameManager.Instance.OnGameOver -= SetGameOverScreen;
-        _scoreManager.brokenHighScore -= ActivateNewHighScoreLabel;
+        scoreManager.OnHighScoreChanged -= ActivateNewHighScoreChangedLabel;
     }
-
-
+    
     private void SetGameOverScreen()
     {
-        if (gameOverScreen == null) return;
-       
         gameOverScreen.SetActive(true);
         SetScoreTexts();
-        CheckMedals();
-
+        SetMedals();
     }
 
-    private void CheckMedals()
+    private void SetMedals()
     {
-        if (PlayerPrefs.GetFloat("HighScore") > GameManager.Instance.GoldMedalScore)
+        if (!GameManager.TryGetMedal(out var medal)) return;
+        
+        medalObjectSpriteRenderer.sprite = GetMedalSprite(medal);
+        ActivateMedalAnimation();
+    }
+    
+    private Sprite GetMedalSprite(Medal medal)
+    {
+        switch (medal)
         {
-            medalObject.GetComponent<SpriteRenderer>().sprite = goldMedal;
-            ActivateMedalAnimation();
-        }
-        else if (PlayerPrefs.GetFloat("HighScore") > GameManager.Instance.SilverMedalScore)
-        {
-            medalObject.GetComponent<SpriteRenderer>().sprite = silverMedal;
-            ActivateMedalAnimation();
-        }
-        else if (PlayerPrefs.GetFloat("HighScore") > GameManager.Instance.BronzeMedalScore)
-        {
-            medalObject.GetComponent<SpriteRenderer>().sprite = bronzeMedal;
-            ActivateMedalAnimation();
+            case Medal.None:
+                return null;
+            case Medal.Bronze:
+                return bronzeMedal;
+            case Medal.Silver:
+                return silverMedal;
+            case Medal.Gold:
+                return goldMedal;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(medal), medal, null);
         }
     }
-
+    
     private void ActivateMedalAnimation()
     {
-        medalAnimationObject.GetComponent<Animator>().SetTrigger("hasMedal");
+        medalAnimator.SetTrigger("hasMedal");
     }
 
     private void SetScoreTexts()
     {
-        scoreText.text = _scoreManager.CurrentScore.ToString();
-        highScoreText.text = PlayerPrefs.GetFloat("HighScore").ToString();
+        scoreText.text = scoreManager.CurrentScore.ToString();
+        highScoreText.text = PlayerStats.HighScore.ToString();
     }
 
-    private void ActivateNewHighScoreLabel()
+    private void ActivateNewHighScoreChangedLabel()
     {
         newHighScoreLabel.SetActive(true);
     }

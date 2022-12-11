@@ -6,6 +6,11 @@ public class ScrollLeft : MonoBehaviour
 
     private void Update()
     {
+        MoveLeft();
+    }
+
+    private void MoveLeft()
+    {
         transform.Translate(Vector3.left * speed * Time.deltaTime);
     }
 

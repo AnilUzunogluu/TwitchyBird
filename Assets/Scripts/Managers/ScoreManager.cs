@@ -5,16 +5,15 @@ using UnityEngine;
 public class ScoreManager : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI scoreText;
-    
-    
-    private int _currentScore;
-    public int CurrentScore => _currentScore;
 
-    private int _highScore;
-    public int HighScore => _highScore;
+    private string ScoreText
+    {
+        set => scoreText.text = value;
+    }
 
-    private string HighScoreString = nameof(HighScore);
-    public event Action brokenHighScore;
+    public int CurrentScore { get; private set; }
+
+    public event Action OnHighScoreChanged;
 
     private void OnEnable()
     {
@@ -32,22 +31,21 @@ public class ScoreManager : MonoBehaviour
         UpdateScoreText();
     }
 
-    private void IncreaseScore()
+    private void IncreaseScore(int amount = 1)
     {
-        _currentScore++;
+        CurrentScore += amount;
     }
 
     private void UpdateScoreText()
     {
-        scoreText.text = _currentScore.ToString();
+        ScoreText = CurrentScore.ToString();
     }
 
     private void CheckHighScore()
     {
-        if (!(_currentScore > PlayerPrefs.GetFloat(HighScoreString))) return;
+        if (!(CurrentScore > PlayerStats.HighScore)) return;
         
-        _highScore = _currentScore;
-        PlayerPrefs.SetFloat(HighScoreString, HighScore);
-        brokenHighScore?.Invoke();
+        PlayerStats.HighScore = CurrentScore;
+        OnHighScoreChanged?.Invoke();
     }
 }

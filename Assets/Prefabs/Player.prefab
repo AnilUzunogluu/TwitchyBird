@@ -193,6 +193,7 @@ MonoBehaviour:
   upwardsForce: 4750
   upwardsRotationAngle: 20
   rotationSpeed: 175
+  fallRotationAngleMultiplier: 20
   onTap:
     m_PersistentCalls:
       m_Calls:

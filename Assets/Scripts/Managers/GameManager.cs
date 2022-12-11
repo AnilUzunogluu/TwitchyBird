@@ -15,10 +15,6 @@ public class GameManager : MonoBehaviour
     private const int SILVER_MEDAL_SCORE = 25;
     private const int GOLD_MEDAL_SCORE = 50;
 
-    public int BronzeMedalScore => BRONZE_MEDAL_SCORE;
-    public int SilverMedalScore => SILVER_MEDAL_SCORE;
-    public int GoldMedalScore => GOLD_MEDAL_SCORE;
-
     public event Action OnGameOver;
 
     private void Start()
@@ -54,10 +50,37 @@ public class GameManager : MonoBehaviour
 
     public void SetGameOver()
     {
-        foreach (var scrollingObject in _scrollingObjects)
+        for (int i = 0; i < _scrollingObjects.Count; i++)
         {
-            scrollingObject.GameOver();
+            _scrollingObjects[i].GameOver();
         }
+        
         OnGameOver?.Invoke();
+    }
+    
+    public static bool TryGetMedal(out Medal medal)
+    {
+        var highScore = PlayerStats.HighScore;
+        
+        if (highScore < BRONZE_MEDAL_SCORE)
+        {
+            medal = Medal.None;
+            return false;
+        }
+        
+        if (highScore >= GOLD_MEDAL_SCORE)
+        {
+            medal = Medal.Gold;
+        }
+        else if (highScore >= SILVER_MEDAL_SCORE)
+        {
+            medal = Medal.Silver;
+        }
+        else
+        {
+            medal = Medal.Bronze;
+        }
+        
+        return true;
     }
 }
